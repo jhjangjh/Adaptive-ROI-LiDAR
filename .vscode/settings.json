@@ -1,0 +1,18 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/jjh/carla-ros-bridge/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/home/jjh/Carla/PythonAPI/carla/dist/carla-0.9.12-py3.7-linux-x86_64.egg",
+        "/home/jjh/Carla/PythonAPI/carla"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/jjh/carla-ros-bridge/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/home/jjh/Carla/PythonAPI/carla/dist/carla-0.9.12-py3.7-linux-x86_64.egg",
+        "/home/jjh/Carla/PythonAPI/carla"
+    ],
+    "ros.distro": "noetic",
+    "files.associations": {
+        "string": "cpp"
+    }
+}

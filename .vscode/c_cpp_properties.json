@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "${default}",
+                "limitSymbolsToIncludedHeaders": false
+            },
+            "includePath": [
+                "/home/jjh/carla-ros-bridge/catkin_ws/devel/include/**",
+                "/opt/ros/noetic/include/**",
+                "/home/jjh/carla-ros-bridge/catkin_ws/src/ros-bridge/pcl_recorder/include/**",
+                "/home/jjh/git/Adaptive-ROI-LiDAR/src/preprocessing/three_lidar_roi/include/**",
+                "/usr/include/**",
+                "${workspaceFolder}/src/preprocessing/three_lidar_roi/include/left_lidar",
+                "/opt/ros/noetic/include",
+                "/usr/include/pcl-1.10",
+                "${workspaceFolder}/src/preprocessing/three_lidar_roi/include"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++14"
+        }
+    ],
+    "version": 4
+}
