@@ -56,9 +56,11 @@ public:
     void UpdateRviz();
 
     void LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lidar_msg);
+    void VehicleStatusCallback(const carla_msgs::CarlaEgoVehicleStatusConstPtr &in_vehicle_status_msg);
 
     pcl::PCLPointCloud2 Ransac(const pcl::PCLPointCloud2 input_cloud);
     pcl::PCLPointCloud2 Voxelize(const pcl::PCLPointCloud2 input_cloud);
+    pcl::PCLPointCloud2 AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, carla_msgs::CarlaEgoVehicleStatus vehicle_status);
 
 private:
     // Publisher
@@ -66,6 +68,7 @@ private:
 
     // Subscriber
     ros::Subscriber s_lidar_sub;
+    ros::Subscriber s_vehicle_status_sub;
 
     // Environments
     IniParser v_ini_parser_;
@@ -77,6 +80,9 @@ private:
     pcl::PointCloud<pcl::PointXYZ>::Ptr m_cloud_raw_ptr;
     pcl::PCLPointCloud2 m_cloud_raw;
     sensor_msgs::PointCloud2 m_output;
+
+    carla_msgs::CarlaEgoVehicleStatus m_vehicle_status;
+
     int m_print_count = 0;
 };
 

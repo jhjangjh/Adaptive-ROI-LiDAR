@@ -9,6 +9,7 @@ LeftLidarRoi::LeftLidarRoi(ros::NodeHandle &nh_){
 
     p_processed_lidar_pub = nh_.advertise<pcl::PCLPointCloud2>("processed_lidar",100);
     s_lidar_sub = nh_.subscribe("/carla/ego_vehicle/lidar_front_left", 10, &LeftLidarRoi::LidarCallback, this);
+    s_vehicle_status_sub = nh_.subscribe("/carla/ego_vehicle/vehicle_status", 10, &LeftLidarRoi::VehicleStatusCallback, this);
 
     Init();
 }
@@ -40,6 +41,10 @@ void LeftLidarRoi::LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lida
     pcl::toPCLPointCloud2(*m_cloud_raw_ptr, m_cloud_raw);
 }
 
+void LeftLidarRoi::VehicleStatusCallback(const carla_msgs::CarlaEgoVehicleStatusConstPtr &in_vehicle_status_msg){
+    m_vehicle_status = *in_vehicle_status_msg;
+}
+
 void LeftLidarRoi::Run(){
     ProcessINI();
     if(m_cloud_raw_ptr->size() != 0)
@@ -49,6 +54,9 @@ void LeftLidarRoi::Run(){
         
         // Voxelize
         pcl::PCLPointCloud2 voxel_cloud = Voxelize(ransac_cloud);
+
+        // Adaptive ROI processing
+
         
         pcl_conversions::fromPCL(voxel_cloud, m_output);
 
@@ -114,6 +122,10 @@ pcl::PCLPointCloud2 LeftLidarRoi::Voxelize(const pcl::PCLPointCloud2 input_cloud
     pcl::toPCLPointCloud2(*voxelized_ptr,output);
 
     return output;
+}
+
+pcl::PCLPointCloud2 LeftLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, carla_msgs::CarlaEgoVehicleStatus vehicle_status){
+
 }
 
 void LeftLidarRoi::UpdateRviz(){
