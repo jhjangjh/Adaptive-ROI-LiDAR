@@ -39,6 +39,10 @@
 #include <pcl/filters/passthrough.h>
 #include <pcl/kdtree/kdtree.h>
 #include <pcl/segmentation/extract_clusters.h>
+#include <pcl/sample_consensus/model_types.h>
+#include <pcl/sample_consensus/method_types.h>
+#include <pcl/segmentation/sac_segmentation.h>
+#include <pcl/filters/extract_indices.h>
 
 class LeftLidarRoi{
 public:
@@ -53,8 +57,11 @@ public:
 
     void LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lidar_msg);
 
+    pcl::PCLPointCloud2 Ransac(const pcl::PCLPointCloud2 cloud);
+
 private:
     // Publisher
+    ros::Publisher p_processed_lidar_pub;
 
     // Subscriber
     ros::Subscriber s_lidar_sub;
@@ -67,7 +74,8 @@ private:
 
     // Variables
     pcl::PointCloud<pcl::PointXYZ>::Ptr m_cloud_raw_ptr;
-
+    pcl::PCLPointCloud2 m_cloud_raw;
+    sensor_msgs::PointCloud2 m_output;
 };
 
 #endif // __LEFT_LIDAR_ROI_HPP__

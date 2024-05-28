@@ -4,6 +4,7 @@
 
 typedef struct {
     double voxel_size;
+    double ransac_threshold;
 } ThreeLidarRoiParameters;
 
 #endif  // __THREE_LIDAR_ROI_CONFIG_HPP__
