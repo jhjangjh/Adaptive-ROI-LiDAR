@@ -7,7 +7,7 @@ LeftLidarRoi::LeftLidarRoi(ros::NodeHandle &nh_){
     std::string ini_dir("/config/lidar.ini");
     v_ini_parser_.Init((dir+ini_dir).c_str());
 
-    p_processed_lidar_pub = nh_.advertise<pcl::PCLPointCloud2>("/processed_lidar",100);
+    p_processed_lidar_pub = nh_.advertise<pcl::PCLPointCloud2>("processed_lidar",100);
     s_lidar_sub = nh_.subscribe("/carla/ego_vehicle/lidar_front_left", 10, &LeftLidarRoi::LidarCallback, this);
 
     Init();
@@ -42,8 +42,23 @@ void LeftLidarRoi::LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lida
 
 void LeftLidarRoi::Run(){
     ProcessINI();
-    pcl::PCLPointCloud2 ransac_cloud = Ransac(m_cloud_raw);
-    pcl_conversions::fromPCL(ransac_cloud, m_output);
+    if(m_cloud_raw_ptr->size() != 0)
+    {
+        pcl::PCLPointCloud2 ransac_cloud = Ransac(m_cloud_raw);
+        pcl_conversions::fromPCL(ransac_cloud, m_output);
+
+
+
+
+        if(m_print_count++ % 20 == 0)
+        {
+            ROS_INFO_STREAM("Left LiDAR Processing...");
+        }
+    }
+    else
+    {
+        ROS_WARN_STREAM("No Left LiDAR Point!!");
+    }
 }
 
 pcl::PCLPointCloud2 LeftLidarRoi::Ransac(const pcl::PCLPointCloud2 input_cloud){

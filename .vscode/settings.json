@@ -13,6 +13,7 @@
     ],
     "ros.distro": "noetic",
     "files.associations": {
-        "string": "cpp"
+        "string": "cpp",
+        "fstream": "cpp"
     }
 }

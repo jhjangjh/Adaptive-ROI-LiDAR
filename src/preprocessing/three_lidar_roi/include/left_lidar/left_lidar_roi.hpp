@@ -76,6 +76,7 @@ private:
     pcl::PointCloud<pcl::PointXYZ>::Ptr m_cloud_raw_ptr;
     pcl::PCLPointCloud2 m_cloud_raw;
     sensor_msgs::PointCloud2 m_output;
+    int m_print_count = 0;
 };
 
 #endif // __LEFT_LIDAR_ROI_HPP__
