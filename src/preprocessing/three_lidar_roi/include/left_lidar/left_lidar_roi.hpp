@@ -4,13 +4,24 @@
 
 // STD header
 #include <string>
+#include <stdlib.h>
+#include <fstream>
 
 // ROS header
 #include <ros/ros.h>
 #include <tf/tf.h>
 
+// Utility header
+#include <util/ini_parser.hpp>
+
+// Config header
+#include <three_lidar_roi_config.hpp>
+
 // Message header
 #include <sensor_msgs/PointCloud2.h>
+
+// carla
+#include <carla_msgs/CarlaEgoVehicleStatus.h>
 
 // PCL header
 #include <pcl_ros/point_cloud.h>
@@ -35,6 +46,7 @@ public:
     ~LeftLidarRoi();
 
     void Init();
+    void ProcessINI();
     void Run();
     void Publish();
     void UpdateRviz();
@@ -46,7 +58,13 @@ private:
 
     // Subscriber
     ros::Subscriber s_lidar_sub;
-    
+
+    // Environments
+    IniParser v_ini_parser_;
+
+    // Configuration parameters
+    ThreeLidarRoiParameters three_lidar_roi_params_;   
+
     // Variables
     pcl::PointCloud<pcl::PointXYZ>::Ptr m_cloud_raw_ptr;
 

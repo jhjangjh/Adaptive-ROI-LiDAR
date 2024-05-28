@@ -124,7 +124,11 @@ include_directories(
   ${PCL_INCLUDE_DIRS}
 )
 
-add_executable(left_lidar_roi_node src/left_lidar/left_lidar_roi.cpp src/left_lidar/left_lidar_roi_node.cpp)
+add_executable(left_lidar_roi_node
+    src/left_lidar/left_lidar_roi.cpp
+    src/left_lidar/left_lidar_roi_node.cpp
+    src/util/ini_parser.cpp
+)
 
 target_link_libraries(left_lidar_roi_node 
   ${catkin_LIBRARIES}
