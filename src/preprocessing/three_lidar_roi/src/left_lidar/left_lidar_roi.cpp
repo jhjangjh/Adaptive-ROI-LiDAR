@@ -44,8 +44,13 @@ void LeftLidarRoi::Run(){
     ProcessINI();
     if(m_cloud_raw_ptr->size() != 0)
     {
+        // RANSAC
         pcl::PCLPointCloud2 ransac_cloud = Ransac(m_cloud_raw);
-        pcl_conversions::fromPCL(ransac_cloud, m_output);
+        
+        // Voxelize
+        pcl::PCLPointCloud2 voxel_cloud = Voxelize(ransac_cloud);
+        
+        pcl_conversions::fromPCL(voxel_cloud, m_output);
 
 
 
@@ -91,6 +96,24 @@ pcl::PCLPointCloud2 LeftLidarRoi::Ransac(const pcl::PCLPointCloud2 input_cloud){
     pcl::toPCLPointCloud2(*cloud_ground_removal, output_cloud);
 
     return output_cloud;
+}
+
+pcl::PCLPointCloud2 LeftLidarRoi::Voxelize(const pcl::PCLPointCloud2 input_cloud){
+    pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);;
+    pcl::PointCloud<pcl::PointXYZ>::Ptr voxelized_ptr(new pcl::PointCloud<pcl::PointXYZ>);;
+    pcl::fromPCLPointCloud2(input_cloud, *input_cloud_ptr);
+
+    double voxelsize = three_lidar_roi_params_.voxel_size;
+
+    voxel_filter.setInputCloud(input_cloud_ptr);
+    voxel_filter.setLeafSize(voxelsize,voxelsize,voxelsize);
+    voxel_filter.filter(*voxelized_ptr);
+
+    pcl::PCLPointCloud2 output;
+    pcl::toPCLPointCloud2(*voxelized_ptr,output);
+
+    return output;
 }
 
 void LeftLidarRoi::UpdateRviz(){

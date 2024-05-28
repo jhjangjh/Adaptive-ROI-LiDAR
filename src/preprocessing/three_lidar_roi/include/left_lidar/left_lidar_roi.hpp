@@ -57,7 +57,8 @@ public:
 
     void LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lidar_msg);
 
-    pcl::PCLPointCloud2 Ransac(const pcl::PCLPointCloud2 cloud);
+    pcl::PCLPointCloud2 Ransac(const pcl::PCLPointCloud2 input_cloud);
+    pcl::PCLPointCloud2 Voxelize(const pcl::PCLPointCloud2 input_cloud);
 
 private:
     // Publisher
