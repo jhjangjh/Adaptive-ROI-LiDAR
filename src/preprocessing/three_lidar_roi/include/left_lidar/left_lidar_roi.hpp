@@ -62,6 +62,9 @@ public:
     pcl::PCLPointCloud2 Voxelize(const pcl::PCLPointCloud2 input_cloud);
     pcl::PCLPointCloud2 AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, carla_msgs::CarlaEgoVehicleStatus vehicle_status);
 
+    double GetAngle(double x, double y);
+    double GetTan(double x, double y, double z);
+
 private:
     // Publisher
     ros::Publisher p_processed_lidar_pub;
@@ -84,6 +87,16 @@ private:
     carla_msgs::CarlaEgoVehicleStatus m_vehicle_status;
 
     int m_print_count = 0;
+
+    // Vehicle Specifications
+    float ego_vehicle_x_size = 5.2;  // length
+    float ego_vehicle_y_size = 2.62; // width
+    float ego_vehicle_z_size = 2.4;  // height
+
+    float ego_vehicle_x = -2.7;                                  // in left lidar frame
+    float ego_vehicle_y = -1.4;                                  // in left lidar frame
+
+
 };
 
 #endif // __LEFT_LIDAR_ROI_HPP__
