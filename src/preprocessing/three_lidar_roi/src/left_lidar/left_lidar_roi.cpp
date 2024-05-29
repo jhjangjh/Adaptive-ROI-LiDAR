@@ -67,8 +67,6 @@ void LeftLidarRoi::Run(){
         pcl_conversions::fromPCL(adapive_roi_cloud, m_output);
 
 
-
-
         if(m_print_count++ % 20 == 0)
         {
             ROS_INFO_STREAM("Left LiDAR Processing...");
