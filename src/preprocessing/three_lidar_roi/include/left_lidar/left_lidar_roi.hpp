@@ -60,10 +60,12 @@ public:
 
     pcl::PCLPointCloud2 Ransac(const pcl::PCLPointCloud2 input_cloud);
     pcl::PCLPointCloud2 Voxelize(const pcl::PCLPointCloud2 input_cloud);
-    pcl::PCLPointCloud2 AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, carla_msgs::CarlaEgoVehicleStatus vehicle_status);
+    pcl::PCLPointCloud2 AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, double velocity);
 
-    double GetAngle(double x, double y);
-    double GetTan(double x, double y, double z);
+    int GetRadius(double velocity);
+    double GetHorizontalAngle(double x, double y);
+    double GetVerticalAngle(double x, double y, double z);
+    double GetVerticalROI(double velocity);
 
 private:
     // Publisher
@@ -85,6 +87,7 @@ private:
     sensor_msgs::PointCloud2 m_output;
 
     carla_msgs::CarlaEgoVehicleStatus m_vehicle_status;
+    double m_velocity;
 
     int m_print_count = 0;
 

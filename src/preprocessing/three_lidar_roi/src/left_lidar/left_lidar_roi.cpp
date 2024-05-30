@@ -47,6 +47,7 @@ void LeftLidarRoi::LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lida
 
 void LeftLidarRoi::VehicleStatusCallback(const carla_msgs::CarlaEgoVehicleStatusConstPtr &in_vehicle_status_msg){
     m_vehicle_status = *in_vehicle_status_msg;
+    m_velocity = m_vehicle_status.velocity;
 }
 
 void LeftLidarRoi::Run(){
@@ -62,7 +63,7 @@ void LeftLidarRoi::Run(){
 
         // Adaptive ROI processing
         // pcl::PCLPointCloud2 adapive_roi_cloud = AdaptiveROI(m_cloud_raw,m_vehicle_status);
-        pcl::PCLPointCloud2 adapive_roi_cloud = AdaptiveROI(voxel_cloud,m_vehicle_status);
+        pcl::PCLPointCloud2 adapive_roi_cloud = AdaptiveROI(voxel_cloud,m_velocity);
         
         pcl_conversions::fromPCL(adapive_roi_cloud, m_output);
 
@@ -130,7 +131,7 @@ pcl::PCLPointCloud2 LeftLidarRoi::Voxelize(const pcl::PCLPointCloud2 input_cloud
     return output;
 }
 
-pcl::PCLPointCloud2 LeftLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, carla_msgs::CarlaEgoVehicleStatus vehicle_status){
+pcl::PCLPointCloud2 LeftLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, double velocity){
     // Move lidar center point (by KDTree Radius Search)
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromPCLPointCloud2(input_cloud, *input_cloud_ptr);
@@ -142,7 +143,7 @@ pcl::PCLPointCloud2 LeftLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cl
 
     pcl::PointXYZ query_point(ego_vehicle_x, ego_vehicle_y, ego_vehicle_z_size / 2);
 
-    float radius = 100; // TBD
+    int radius = GetRadius(velocity);
 
     kdtree.setInputCloud(input_cloud_ptr);
     kdtree.radiusSearch(query_point, radius, idxes, sqr_dists);
@@ -163,9 +164,17 @@ pcl::PCLPointCloud2 LeftLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cl
     // ROI Angle Setting
     for(unsigned int j=0; j<boundary->points.size(); j++)
     {
-        double angle_h = GetAngle(boundary->points[j].x - ego_vehicle_x,boundary->points[j].y - ego_vehicle_y);
+        double angle_h = GetHorizontalAngle((boundary->points[j].x - ego_vehicle_x) , (boundary->points[j].y - ego_vehicle_y));
+        double angle_v = GetVerticalAngle(boundary->points[j].x , boundary->points[j].y , boundary->points[j].z);
 
         if(angle_h > 153.3) // 153.3 = 180 - degree(arctan(1.31/2.6)) 
+        {
+            boundary->points[j].x = ego_vehicle_x;
+            boundary->points[j].y = ego_vehicle_y;
+            boundary->points[j].z = 0;
+        }
+
+        if(angle_v > GetVerticalROI(velocity)) // 153.3 = 180 - degree(arctan(1.31/2.6)) 
         {
             boundary->points[j].x = ego_vehicle_x;
             boundary->points[j].y = ego_vehicle_y;
@@ -205,22 +214,45 @@ void LeftLidarRoi::UpdateRviz(){
 
 }
 
-double LeftLidarRoi::GetAngle(double x, double y)
-{
-  double r;
-  double theta;
+int LeftLidarRoi::GetRadius(double velocity){  // TBD
+    float time_delay = 0.5;
+    float time_detect = 0.3;
+    float time_safe = 1.;
+    float times = time_delay + time_detect + time_safe;
 
-  r = sqrt((x*x)+(y*y));
-  theta = acos(x/r)*180/M_PI;
-  return theta;
+    // int radius = round(velocity * times);
+    int radius = 100;
+    return radius;
 }
 
-double LeftLidarRoi::GetTan(double x, double y, double z)
+double LeftLidarRoi::GetHorizontalAngle(double x, double y)
 {
-  double r;
-  double theta;
+    double r;
+    double theta;
 
-  r = sqrt((x*x)+(y*y));
-  theta = atan(z/r)*180/M_PI;
-  return theta;
+    r = sqrt((x*x)+(y*y));
+    theta = acos(x/r)*180/M_PI;
+    return theta;
+}
+
+double LeftLidarRoi::GetVerticalAngle(double x, double y, double z)
+{
+    double r;
+    double theta;
+
+    r = sqrt((x*x)+(y*y));
+    theta = atan(z/r)*180/M_PI;
+    return theta;
+}
+
+double LeftLidarRoi::GetVerticalROI(double velocity){  // TBD
+    double angle_limit;
+
+    if (velocity < 60){
+        angle_limit = 22.5;
+    }
+    else{
+        angle_limit = 5.7 - (0.2 * (velocity - 60));
+    }
+    return angle_limit;
 }
