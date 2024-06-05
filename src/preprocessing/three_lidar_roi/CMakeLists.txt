@@ -135,6 +135,17 @@ target_link_libraries(left_lidar_roi_node
   ${PCL_LIBRARIES}
 )
 
+add_executable(right_lidar_roi_node
+    src/right_lidar/right_lidar_roi.cpp
+    src/right_lidar/right_lidar_roi_node.cpp
+    src/util/ini_parser.cpp
+)
+
+target_link_libraries(right_lidar_roi_node 
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+)
+
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/three_lidar_roi.cpp

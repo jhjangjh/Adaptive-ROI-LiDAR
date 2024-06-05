@@ -1,0 +1,6 @@
+<launch>
+
+    <node pkg='three_lidar_roi' name='right_lidar_roi_node' type='right_lidar_roi_node' output = 'screen'>
+    </node>  
+
+</launch>
