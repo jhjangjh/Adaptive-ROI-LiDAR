@@ -1,0 +1,20 @@
+<!-- -->
+<launch>
+  <arg name="frame_id"                         default="ego_vehicle"/>
+  <!-- <arg name="input_topics"                     default="[/front_lidar/points, /left_lidar/points]" /> -->
+
+  <arg name="input_topics"                     default="[/left_lidar_roi_node/processed_lidar, /right_lidar_roi_node/processed_lidar,
+                                                        /rear_lidar_roi_node/processed_lidar]" />
+
+
+  <arg name="topic_name"                       default="/processed_three_lidar"/>
+  <arg name="debug"                            default="true"/>
+
+
+  <node pkg="multi_lidar_combiner_pkg" type="multi_lidar_combiner_node" name="processed_lidar_combiner_node" output="screen">
+    <param name="frame_id"    value="$(arg frame_id)"/>
+    <param name="input_topics" value="$(arg input_topics)" />
+    <param name="topic_name"  value="$(arg topic_name)"/>
+    <param name="debug"       value="$(arg debug)"/>
+  </node>
+</launch>

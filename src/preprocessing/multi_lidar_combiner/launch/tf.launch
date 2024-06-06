@@ -1,0 +1,18 @@
+<launch>
+  <node pkg="tf" type="static_transform_publisher" name="laser_link_left_to_laser_link_right" args="0.786408  -2.39245 0.0649766   0.417687  0.0024661 -0.0285641 /laser_link_left /laser_link_right 10" />
+  <node pkg="tf" type="static_transform_publisher" name="lidar_link_to_base_link" args="0.2 1.2 0.0 -0.31 0 0 lidar_link laser_link_left 10" />
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_imu_link" args="-1.5 0 1 0 0 0  lidar_link imu_link 10" />
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_gps_main_link" args="-0.69 0 3.1 0 0 0  lidar_link gps_main_link 10" />
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_gps_sub_link" args="-1.69 0 3.1 0 0 0  lidar_link gps_sub_link 10" />
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_lidar_link" args="0 0 0 0 0 0  base_link lidar_link 10" />
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_radar_link" args="0 0 0 0 0 0  base_link radar_link 10" />
+  
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_rviz_link" args="0 0 -1.1 0 0 0  base_link rviz_link 10" />
+  
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_front_axis_link" args="-1.65 0 -1.1 0 0 0  base_link front_axis_link 10" />
+  <node pkg="tf" type="static_transform_publisher" name="front_axis_link_rear_axis_link" args="-3.25 0 0 0 0 0  front_axis_link rear_axis_link 10" />
+
+
+</launch>
