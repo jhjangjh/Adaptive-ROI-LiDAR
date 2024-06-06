@@ -1,6 +1,6 @@
-#include <right_lidar/right_lidar_roi.hpp>
+#include <rear_lidar/rear_lidar_roi.hpp>
 
-RightLidarRoi::RightLidarRoi(ros::NodeHandle &nh_){
+RearLidarRoi::RearLidarRoi(ros::NodeHandle &nh_){
 
     // Ini initialization
     std::string dir(getenv("PWD"));
@@ -9,48 +9,48 @@ RightLidarRoi::RightLidarRoi(ros::NodeHandle &nh_){
 
     p_processed_lidar_pub = nh_.advertise<pcl::PCLPointCloud2>("processed_lidar",100);
 
-    s_lidar_sub = nh_.subscribe("/carla/ego_vehicle/lidar_front_right", 10, &RightLidarRoi::LidarCallback, this);
-    s_vehicle_status_sub = nh_.subscribe("/carla/ego_vehicle/vehicle_status", 10, &RightLidarRoi::VehicleStatusCallback, this);
+    s_lidar_sub = nh_.subscribe("/carla/ego_vehicle/lidar_rear", 10, &RearLidarRoi::LidarCallback, this);
+    s_vehicle_status_sub = nh_.subscribe("/carla/ego_vehicle/vehicle_status", 10, &RearLidarRoi::VehicleStatusCallback, this);
 
     Init();
 }
 
-RightLidarRoi::~RightLidarRoi(){}
+RearLidarRoi::~RearLidarRoi(){}
 
-void RightLidarRoi::Init(){
+void RearLidarRoi::Init(){
     ProcessINI();
 
     m_cloud_raw_ptr.reset(new pcl::PointCloud<pcl::PointXYZ>);
 }
 
-void RightLidarRoi::ProcessINI(){
+void RearLidarRoi::ProcessINI(){
     if (v_ini_parser_.IsFileUpdated()){
-        v_ini_parser_.ParseConfig("right_lidar", "ransac_threshold",
+        v_ini_parser_.ParseConfig("rear_lidar", "ransac_threshold",
                                     three_lidar_roi_params_.ransac_threshold);                                    
-        v_ini_parser_.ParseConfig("right_lidar", "voxel_size",
+        v_ini_parser_.ParseConfig("rear_lidar", "voxel_size",
                                     three_lidar_roi_params_.voxel_size);
-        v_ini_parser_.ParseConfig("right_lidar", "number_of_lanes",
+        v_ini_parser_.ParseConfig("rear_lidar", "number_of_lanes",
                                     three_lidar_roi_params_.number_of_lanes);   
         ROS_WARN("[Preprocessing] Ini file is updated!\n");
     }
 }
 
-void RightLidarRoi::Publish(){
-    m_output.header.frame_id = "ego_vehicle/lidar_front_right";
+void RearLidarRoi::Publish(){
+    m_output.header.frame_id = "ego_vehicle/lidar_rear";
     p_processed_lidar_pub.publish(m_output);
 }
 
-void RightLidarRoi::LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lidar_msg){
+void RearLidarRoi::LidarCallback(const sensor_msgs::PointCloud2ConstPtr &in_lidar_msg){
     pcl::fromROSMsg(*in_lidar_msg,*m_cloud_raw_ptr);
     pcl::toPCLPointCloud2(*m_cloud_raw_ptr, m_cloud_raw);
 }
 
-void RightLidarRoi::VehicleStatusCallback(const carla_msgs::CarlaEgoVehicleStatusConstPtr &in_vehicle_status_msg){
+void RearLidarRoi::VehicleStatusCallback(const carla_msgs::CarlaEgoVehicleStatusConstPtr &in_vehicle_status_msg){
     m_vehicle_status = *in_vehicle_status_msg;
     m_velocity = m_vehicle_status.velocity;
 }
 
-void RightLidarRoi::Run(){
+void RearLidarRoi::Run(){
     ProcessINI();
 
     if(m_cloud_raw_ptr->size() != 0)
@@ -70,18 +70,18 @@ void RightLidarRoi::Run(){
 
         if(m_print_count++ % 20 == 0)
         {
-            ROS_INFO_STREAM("Right LiDAR Processing...");
+            ROS_INFO_STREAM("Rear LiDAR Processing...");
         }
     }
     else
     {
-        ROS_WARN_STREAM("No Right LiDAR Point!!");
+        ROS_WARN_STREAM("No Rear LiDAR Point!!");
     }
 
     UpdateRviz();
 }
 
-pcl::PCLPointCloud2 RightLidarRoi::Ransac(const pcl::PCLPointCloud2 input_cloud){
+pcl::PCLPointCloud2 RearLidarRoi::Ransac(const pcl::PCLPointCloud2 input_cloud){
     pcl::PointCloud<pcl::PointXYZ>::Ptr before_processed_cloud_ptr (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_ground_removal (new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromPCLPointCloud2(input_cloud, *before_processed_cloud_ptr);
@@ -113,7 +113,7 @@ pcl::PCLPointCloud2 RightLidarRoi::Ransac(const pcl::PCLPointCloud2 input_cloud)
     return output_cloud;
 }
 
-pcl::PCLPointCloud2 RightLidarRoi::Voxelize(const pcl::PCLPointCloud2 input_cloud){
+pcl::PCLPointCloud2 RearLidarRoi::Voxelize(const pcl::PCLPointCloud2 input_cloud){
     pcl::VoxelGrid<pcl::PointXYZ> voxel_filter;
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::PointCloud<pcl::PointXYZ>::Ptr voxelized_ptr(new pcl::PointCloud<pcl::PointXYZ>);
@@ -131,7 +131,7 @@ pcl::PCLPointCloud2 RightLidarRoi::Voxelize(const pcl::PCLPointCloud2 input_clou
     return output;
 }
 
-pcl::PCLPointCloud2 RightLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, double velocity){
+pcl::PCLPointCloud2 RearLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_cloud, double velocity){
     // Move lidar center point (by KDTree Radius Search)
     pcl::PointCloud<pcl::PointXYZ>::Ptr input_cloud_ptr(new pcl::PointCloud<pcl::PointXYZ>);
     pcl::fromPCLPointCloud2(input_cloud, *input_cloud_ptr);
@@ -158,7 +158,7 @@ pcl::PCLPointCloud2 RightLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_c
 
     pass.setInputCloud(boundary);
     pass.setFilterFieldName("y");
-    pass.setFilterLimits(-max_road_width / 2. , ego_vehicle_y);
+    pass.setFilterLimits(-max_road_width / 2. , max_road_width / 2.);
     pass.filter(*boundary);
 
     // ROI Angle Setting
@@ -167,7 +167,7 @@ pcl::PCLPointCloud2 RightLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_c
         double angle_h = GetHorizontalAngle((boundary->points[j].x - ego_vehicle_x) , (boundary->points[j].y - ego_vehicle_y));
         double angle_v = GetVerticalAngle(boundary->points[j].x , boundary->points[j].y , boundary->points[j].z);
 
-        if(angle_h > 153.3) // 153.3 = 180 - degree(arctan(1.31/2.6)) 
+        if(angle_h < 153.3) // 153.3 = 180 - degree(arctan(1.31/2.6)) 
         {
             boundary->points[j].x = ego_vehicle_x;
             boundary->points[j].y = ego_vehicle_y;
@@ -191,13 +191,13 @@ pcl::PCLPointCloud2 RightLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_c
 
     pass_vehicle_point.setInputCloud(boundary);
     pass_vehicle_point.setFilterFieldName("x");
-    pass_vehicle_point.setFilterLimits(-5.4,0.0);
+    pass_vehicle_point.setFilterLimits(0.0,5.4);
     pass_vehicle_point.setFilterLimitsNegative(true);
     pass_vehicle_point.filter(*outskirt);
 
     pass_vehicle_point.setInputCloud(boundary);
     pass_vehicle_point.setFilterFieldName("y");
-    pass_vehicle_point.setFilterLimits(0.0,2.8);
+    pass_vehicle_point.setFilterLimits(-1.4,1.4);
     pass_vehicle_point.setFilterLimitsNegative(true);
     pass_vehicle_point.filter(*output_ptr);
 
@@ -210,11 +210,11 @@ pcl::PCLPointCloud2 RightLidarRoi::AdaptiveROI(const pcl::PCLPointCloud2 input_c
 
 }
 
-void RightLidarRoi::UpdateRviz(){
+void RearLidarRoi::UpdateRviz(){
 
 }
 
-int RightLidarRoi::GetRadius(double velocity){  // TBD
+int RearLidarRoi::GetRadius(double velocity){  // TBD
     float time_delay = 0.5;
     float time_detect = 0.3;
     float time_safe = 1.;
@@ -225,7 +225,7 @@ int RightLidarRoi::GetRadius(double velocity){  // TBD
     return radius;
 }
 
-double RightLidarRoi::GetHorizontalAngle(double x, double y)
+double RearLidarRoi::GetHorizontalAngle(double x, double y)
 {
     double r;
     double theta;
@@ -235,7 +235,7 @@ double RightLidarRoi::GetHorizontalAngle(double x, double y)
     return theta;
 }
 
-double RightLidarRoi::GetVerticalAngle(double x, double y, double z)
+double RearLidarRoi::GetVerticalAngle(double x, double y, double z)
 {
     double r;
     double theta;
@@ -245,7 +245,7 @@ double RightLidarRoi::GetVerticalAngle(double x, double y, double z)
     return theta;
 }
 
-double RightLidarRoi::GetVerticalROI(double velocity){  // TBD
+double RearLidarRoi::GetVerticalROI(double velocity){  // TBD
     double angle_limit;
 
     if (velocity < 60){

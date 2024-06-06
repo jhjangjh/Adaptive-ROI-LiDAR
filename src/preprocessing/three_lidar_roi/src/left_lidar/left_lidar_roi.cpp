@@ -4,7 +4,7 @@ LeftLidarRoi::LeftLidarRoi(ros::NodeHandle &nh_){
 
     // Ini initialization
     std::string dir(getenv("PWD"));
-    std::string ini_dir("/config/lidar.ini");
+    std::string ini_dir("/config/preprocessing.ini");
     v_ini_parser_.Init((dir+ini_dir).c_str());
 
     p_processed_lidar_pub = nh_.advertise<pcl::PCLPointCloud2>("processed_lidar",100);
@@ -25,13 +25,13 @@ void LeftLidarRoi::Init(){
 
 void LeftLidarRoi::ProcessINI(){
     if (v_ini_parser_.IsFileUpdated()){
-        v_ini_parser_.ParseConfig("lidar", "ransac_threshold",
+        v_ini_parser_.ParseConfig("left_lidar", "ransac_threshold",
                                     three_lidar_roi_params_.ransac_threshold);                                    
-        v_ini_parser_.ParseConfig("lidar", "voxel_size",
+        v_ini_parser_.ParseConfig("left_lidar", "voxel_size",
                                     three_lidar_roi_params_.voxel_size);
-        v_ini_parser_.ParseConfig("lidar", "number_of_lanes",
+        v_ini_parser_.ParseConfig("left_lidar", "number_of_lanes",
                                     three_lidar_roi_params_.number_of_lanes);   
-        ROS_WARN("[Lidar] Ini file is updated!\n");
+        ROS_WARN("[Preprocessing] Ini file is updated!\n");
     }
 }
 
