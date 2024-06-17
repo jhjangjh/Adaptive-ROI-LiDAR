@@ -30,7 +30,9 @@ void LeftLidarRoi::ProcessINI(){
         v_ini_parser_.ParseConfig("left_lidar", "voxel_size",
                                     three_lidar_roi_params_.voxel_size);
         v_ini_parser_.ParseConfig("left_lidar", "number_of_lanes",
-                                    three_lidar_roi_params_.number_of_lanes);   
+                                    three_lidar_roi_params_.number_of_lanes);
+        v_ini_parser_.ParseConfig("left_lidar", "radius",
+                                    three_lidar_roi_params_.radius);
         ROS_WARN("[Preprocessing] Ini file is updated!\n");
     }
 }
@@ -57,9 +59,12 @@ void LeftLidarRoi::Run(){
     {
         // RANSAC
         pcl::PCLPointCloud2 ransac_cloud = Ransac(m_cloud_raw);
+        // pcl_conversions::fromPCL(ransac_cloud, m_output);
         
         // Voxelize
         pcl::PCLPointCloud2 voxel_cloud = Voxelize(ransac_cloud);
+        // pcl_conversions::fromPCL(voxel_cloud, m_output);
+
 
         // Adaptive ROI processing
         // pcl::PCLPointCloud2 adapive_roi_cloud = AdaptiveROI(m_cloud_raw,m_velocity);
@@ -221,7 +226,7 @@ int LeftLidarRoi::GetRadius(double velocity){  // TBD
     float times = time_delay + time_detect + time_safe;
 
     // int radius = round(velocity * times);
-    int radius = 100;
+    int radius = three_lidar_roi_params_.radius;
     return radius;
 }
 
