@@ -68,8 +68,15 @@ void LeftLidarRoi::Run(){
 
         // Adaptive ROI processing
         // pcl::PCLPointCloud2 adapive_roi_cloud = AdaptiveROI(m_cloud_raw,m_velocity);
+
+        // auto starttime = std::chrono::high_resolution_clock::now(); 
+
         pcl::PCLPointCloud2 adapive_roi_cloud = AdaptiveROI(voxel_cloud,m_velocity);
-        
+
+        // auto endtime = std::chrono::high_resolution_clock::now(); 
+        // auto duration = std::chrono::duration_cast<std::chrono::microseconds>(starttime - endtime).count();
+        // std::cout << "Algorithm running time: " << - duration*(1/1000.0) << "milliseconds" << std::endl;    
+
         pcl_conversions::fromPCL(adapive_roi_cloud, m_output);
 
 
